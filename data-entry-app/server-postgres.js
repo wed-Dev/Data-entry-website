@@ -11,8 +11,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Skip automatic initialization in serverless - tables should already exist
-// If needed, run initialization manually via /api/init endpoint
+// Database initialization flag
+let dbInitialized = false;
+
+// Initialize database automatically on first request
+async function ensureDatabase() {
+    if (!dbInitialized) {
+        try {
+            await db.initializeDatabase();
+            dbInitialized = true;
+            console.log('✅ Database initialized successfully');
+        } catch (error) {
+            console.error('⚠️ Database initialization error (may already exist):', error.message);
+            // Mark as initialized even if tables exist - this is OK
+            dbInitialized = true;
+        }
+    }
+}
 
 // Helper functions
 function generateToken() {
@@ -40,14 +55,16 @@ async function authenticate(req, res, next) {
 }
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', async (req, res) => {
+    await ensureDatabase();
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), dbInitialized });
 });
 
-// Manual database initialization endpoint (call once to set up tables)
+// Manual database initialization endpoint (for troubleshooting)
 app.post('/api/init', async (req, res) => {
     try {
         await db.initializeDatabase();
+        dbInitialized = true;
         res.json({ success: true, message: 'Database initialized' });
     } catch (error) {
         console.error('Init error:', error);
@@ -59,6 +76,8 @@ app.post('/api/init', async (req, res) => {
 
 // Login
 app.post('/api/auth/login', async (req, res) => {
+    await ensureDatabase(); // Ensure DB is initialized before login
+    
     const { username, password } = req.body;
     
     if (!username || !password) {

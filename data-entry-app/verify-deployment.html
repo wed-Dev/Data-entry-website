@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #64748b;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .test-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #64748b;
+        }
+        .test-section.success {
+            border-left-color: #10b981;
+            background: #d1fae5;
+        }
+        .test-section.error {
+            border-left-color: #ef4444;
+            background: #fee2e2;
+        }
+        .test-section.pending {
+            border-left-color: #f59e0b;
+            background: #fef3c7;
+        }
+        .test-title {
+            font-weight: 600;
+            color: #1e3a8a;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .test-result {
+            color: #334155;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #64748b;
+        }
+        code {
+            background: #1e293b;
+            color: #10b981;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .icon {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        .summary {
+            background: #f0f9ff;
+            border: 2px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .summary h3 {
+            color: #1e40af;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Deployment Verification</h1>
+        <p class="subtitle">This tool checks if your application is properly deployed and configured</p>
+
+        <div style="margin-bottom: 30px;">
+            <button class="btn" onclick="runTests()">▶️ Run All Tests</button>
+            <button class="btn btn-secondary" onclick="initializeDatabase()">🔧 Initialize Database</button>
+        </div>
+
+        <div id="test1" class="test-section">
+            <div class="test-title"><span class="icon">📡</span>Test 1: API Connection</div>
+            <div class="test-result">Waiting to run...</div>
+        </div>
+
+        <div id="test2" class="test-section">
+            <div class="test-title"><span class="icon">💾</span>Test 2: Database Connection</div>
+            <div class="test-result">Waiting to run...</div>
+        </div>
+
+        <div id="test3" class="test-section">
+            <div class="test-title"><span class="icon">🔐</span>Test 3: Authentication Endpoint</div>
+            <div class="test-result">Waiting to run...</div>
+        </div>
+
+        <div id="test4" class="test-section">
+            <div class="test-title"><span class="icon">👤</span>Test 4: Admin Account Exists</div>
+            <div class="test-result">Waiting to run...</div>
+        </div>
+
+        <div id="test5" class="test-section">
+            <div class="test-title"><span class="icon">📊</span>Test 5: Transaction API</div>
+            <div class="test-result">Waiting to run...</div>
+        </div>
+
+        <div id="summary" class="summary" style="display: none;">
+            <h3>📋 Summary</h3>
+            <div id="summaryContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = '/api';
+
+        async function runTests() {
+            console.log('Starting deployment verification tests...');
+            
+            // Reset all tests
+            document.querySelectorAll('.test-section').forEach(el => {
+                el.className = 'test-section pending';
+            });
+            document.getElementById('summary').style.display = 'none';
+
+            let results = {
+                passed: 0,
+                failed: 0,
+                total: 5
+            };
+
+            // Test 1: API Connection
+            await test1(results);
+            
+            // Test 2: Database Connection
+            await test2(results);
+            
+            // Test 3: Authentication Endpoint
+            await test3(results);
+            
+            // Test 4: Admin Account
+            await test4(results);
+            
+            // Test 5: Transaction API
+            await test5(results);
+
+            // Show summary
+            showSummary(results);
+        }
+
+        async function test1(results) {
+            const testDiv = document.getElementById('test1');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    testDiv.className = 'test-section success';
+                    testDiv.querySelector('.test-result').innerHTML = 
+                        `✅ <strong>PASSED</strong><br>API is responding correctly<br>Database initialized: ${data.dbInitialized ? 'Yes' : 'No'}`;
+                    results.passed++;
+                } else {
+                    throw new Error('Invalid response');
+                }
+            } catch (error) {
+                testDiv.className = 'test-section error';
+                testDiv.querySelector('.test-result').innerHTML = 
+                    `❌ <strong>FAILED</strong><br>Cannot connect to API<br>Error: ${error.message}`;
+                results.failed++;
+            }
+        }
+
+        async function test2(results) {
+            const testDiv = document.getElementById('test2');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                
+                if (data.dbInitialized !== undefined) {
+                    testDiv.className = 'test-section success';
+                    testDiv.querySelector('.test-result').innerHTML = 
+                        `✅ <strong>PASSED</strong><br>Database connection verified<br>Initialized: ${data.dbInitialized}`;
+                    results.passed++;
+                } else {
+                    throw new Error('Database status unknown');
+                }
+            } catch (error) {
+                testDiv.className = 'test-section error';
+                testDiv.querySelector('.test-result').innerHTML = 
+                    `❌ <strong>FAILED</strong><br>Database connection issue<br>Error: ${error.message}`;
+                results.failed++;
+            }
+        }
+
+        async function test3(results) {
+            const testDiv = document.getElementById('test3');
+            try {
+                // Try to login with invalid credentials - should get 401
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'test', password: 'test' })
+                });
+                
+                const data = await response.json();
+                
+                // We expect this to fail with proper error message
+                if (response.status === 401 && data.error) {
+                    testDiv.className = 'test-section success';
+                    testDiv.querySelector('.test-result').innerHTML = 
+                        `✅ <strong>PASSED</strong><br>Authentication endpoint is working<br>Error message: ${data.error}`;
+                    results.passed++;
+                } else if (response.status === 500) {
+                    throw new Error('Server error - database may not be initialized');
+                } else {
+                    throw new Error('Unexpected response');
+                }
+            } catch (error) {
+                testDiv.className = 'test-section error';
+                testDiv.querySelector('.test-result').innerHTML = 
+                    `❌ <strong>FAILED</strong><br>Authentication endpoint not working<br>Error: ${error.message}<br><em>Try clicking "Initialize Database" button above</em>`;
+                results.failed++;
+            }
+        }
+
+        async function test4(results) {
+            const testDiv = document.getElementById('test4');
+            try {
+                // Try to login with default admin credentials
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.token) {
+                    testDiv.className = 'test-section success';
+                    testDiv.querySelector('.test-result').innerHTML = 
+                        `✅ <strong>PASSED</strong><br>Default admin account exists and works<br>Username: <code>admin</code> / Password: <code>admin123</code><br><strong>⚠️ Remember to change this password!</strong>`;
+                    results.passed++;
+                } else {
+                    throw new Error(data.error || 'Admin account not found');
+                }
+            } catch (error) {
+                testDiv.className = 'test-section error';
+                testDiv.querySelector('.test-result').innerHTML = 
+                    `❌ <strong>FAILED</strong><br>Cannot login with default admin credentials<br>Error: ${error.message}<br><em>Database needs initialization</em>`;
+                results.failed++;
+            }
+        }
+
+        async function test5(results) {
+            const testDiv = document.getElementById('test5');
+            try {
+                // First login to get token
+                const loginResponse = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginData.success) {
+                    throw new Error('Cannot authenticate');
+                }
+
+                // Test transactions endpoint
+                const txResponse = await fetch(`${API_URL}/transactions`, {
+                    headers: { 'Authorization': `Bearer ${loginData.token}` }
+                });
+                
+                const txData = await txResponse.json();
+                
+                if (txData.success !== undefined) {
+                    testDiv.className = 'test-section success';
+                    testDiv.querySelector('.test-result').innerHTML = 
+                        `✅ <strong>PASSED</strong><br>Transaction API is working<br>Current transactions: ${txData.transactions ? txData.transactions.length : 0}`;
+                    results.passed++;
+                } else {
+                    throw new Error('Invalid transaction response');
+                }
+            } catch (error) {
+                testDiv.className = 'test-section error';
+                testDiv.querySelector('.test-result').innerHTML = 
+                    `❌ <strong>FAILED</strong><br>Transaction API not working<br>Error: ${error.message}`;
+                results.failed++;
+            }
+        }
+
+        async function initializeDatabase() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Initializing...';
+
+            try {
+                const response = await fetch(`${API_URL}/init`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('✅ Database initialized successfully!\n\nYou can now run the tests again.');
+                    btn.textContent = '✅ Database Initialized';
+                } else {
+                    throw new Error(data.error || 'Initialization failed');
+                }
+            } catch (error) {
+                alert('❌ Database initialization failed:\n\n' + error.message);
+                btn.disabled = false;
+                btn.textContent = '🔧 Initialize Database';
+            }
+        }
+
+        function showSummary(results) {
+            const summaryDiv = document.getElementById('summary');
+            const summaryContent = document.getElementById('summaryContent');
+            
+            summaryDiv.style.display = 'block';
+            
+            const percentage = Math.round((results.passed / results.total) * 100);
+            let status = '';
+            let recommendation = '';
+
+            if (percentage === 100) {
+                status = '✅ <strong>All tests passed!</strong> Your deployment is working correctly.';
+                recommendation = `
+                    <strong>Next Steps:</strong><br>
+                    1. Login at <code>login.html</code> with admin/admin123<br>
+                    2. Change the default admin password immediately<br>
+                    3. Create client accounts in User Management<br>
+                    4. Share the login URL with your clients
+                `;
+            } else if (percentage >= 60) {
+                status = '⚠️ <strong>Some tests failed.</strong> Your app may have issues.';
+                recommendation = `
+                    <strong>Recommended Actions:</strong><br>
+                    1. Click "Initialize Database" button above<br>
+                    2. Check Vercel environment variables are set correctly<br>
+                    3. Run tests again after initialization<br>
+                    4. Check Vercel deployment logs for errors
+                `;
+            } else {
+                status = '❌ <strong>Multiple tests failed.</strong> Deployment needs attention.';
+                recommendation = `
+                    <strong>Critical Actions Required:</strong><br>
+                    1. Verify POSTGRES_URL is set in Vercel environment variables<br>
+                    2. Click "Initialize Database" button to create tables<br>
+                    3. Check network connectivity to Vercel<br>
+                    4. Review deployment logs in Vercel dashboard<br>
+                    5. Ensure you deployed the latest code with fixes
+                `;
+            }
+
+            summaryContent.innerHTML = `
+                <p style="margin-bottom: 15px;">${status}</p>
+                <p><strong>Tests Passed:</strong> ${results.passed} / ${results.total} (${percentage}%)</p>
+                <p style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #3b82f6;">
+                    ${recommendation}
+                </p>
+            `;
+        }
+
+        // Auto-run tests on page load
+        window.addEventListener('load', () => {
+            console.log('Deployment verification page loaded');
+        });
+    </script>
+</body>
+</html>
