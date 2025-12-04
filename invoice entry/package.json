@@ -1,0 +1,29 @@
+{
+  "name": "business-transaction-entry",
+  "version": "1.0.0",
+  "description": "Business Transaction Entry System with Supabase",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "next": "^14.2.0",
+    "@supabase/supabase-js": "^2.45.0",
+    "@supabase/auth-helpers-nextjs": "^0.8.7",
+    "axios": "^1.7.0",
+    "lucide-react": "^0.416.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.6",
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.1"
+  }
+}
