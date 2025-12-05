@@ -1,5 +1,9 @@
-import { redirect } from 'next/navigation'
+'use client'
 
 export default function RootRedirect() {
-  redirect('/auth/login')
+  if (typeof window !== 'undefined') {
+    window.location.href = '/auth/login'
+  }
+  
+  return null
 }
