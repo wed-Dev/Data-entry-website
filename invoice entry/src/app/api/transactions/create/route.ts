@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
 
     const supabase = supabaseServer()
 
+    // Insert into transactions table
+    // The table has: id, user_id, customer_id, pickup_location, destination_location, date, time, price, created_at
     const { data, error } = await supabase
       .from('transactions')
       .insert([
@@ -38,9 +40,13 @@ export async function POST(req: NextRequest) {
       .select('*')
       .single()
 
-    if (error || !data) {
+    if (error) {
       console.error('Create transaction error:', error)
-      return NextResponse.json({ error: error?.message || 'Create failed' }, { status: 500 })
+      return NextResponse.json({ error: error.message || 'Create failed' }, { status: 500 })
+    }
+
+    if (!data) {
+      return NextResponse.json({ error: 'Transaction not created' }, { status: 500 })
     }
 
     return NextResponse.json(data, { status: 201 })

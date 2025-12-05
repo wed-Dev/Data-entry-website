@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Server-side client (service role key - for API routes only)
-export function createServerClient() {
+export function supabaseServer() {
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!serviceRoleKey) {
@@ -22,6 +22,9 @@ export function createServerClient() {
 
   return createClient(supabaseUrl, serviceRoleKey)
 }
+
+// Keep the old name for backwards compatibility
+export const createServerClient = supabaseServer
 
 // Verify token validity
 export async function verifyToken(token: string): Promise<string | null> {
