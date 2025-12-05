@@ -1,13 +1,12 @@
-'use client'
-import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth/next'
 
-export default function RootRedirect() {
-  const router = useRouter()
+export default async function RootRedirect() {
+  const session = await getServerSession()
   
-  useEffect(() => {
-    router.replace('/dashboard')
-  }, [router])
-
-  return null
+  if (session) {
+    redirect('/dashboard')
+  } else {
+    redirect('/auth/login')
+  }
 }
