@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     // Get user by email
     const { data: user, error } = await supabase
       .from('users')
-      .select('id, email, password_hash, name')
+      .select('id, email, password_hash')
       .eq('email', email)
       .maybeSingle()
 
@@ -43,7 +43,6 @@ export async function POST(req: NextRequest) {
       token,
       user_id: user.id,
       email: user.email,
-      name: user.name,
     })
   } catch (err) {
     console.error('Login error:', err)

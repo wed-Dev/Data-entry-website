@@ -7,9 +7,9 @@ export async function POST(req: NextRequest) {
   try {
     const { email, password, name } = await req.json()
 
-    if (!email || !password || !name) {
+    if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email, password, and name required' },
+        { error: 'Email and password required' },
         { status: 400 }
       )
     }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     // Insert new user
     const { data, error } = await supabase
       .from('users')
-      .insert([{ email, password_hash, name }])
+      .insert([{ email, password_hash }])
       .select('id, email')
       .single()
 
@@ -59,7 +59,6 @@ export async function POST(req: NextRequest) {
         token,
         user_id: data.id,
         email: data.email,
-        name,
       },
       { status: 201 }
     )
