@@ -1,9 +1,13 @@
 import type { Metadata } from 'next'
+import { Providers } from '@/app/providers'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Business Transaction Entry',
-  description: 'Track every transaction with complete details',
+  title: 'Invoice Entry - Transaction Management',
+  description: 'Complete invoice and transaction management system',
+  icons: {
+    icon: '/favicon.ico',
+  },
 }
 
 export default function RootLayout({
@@ -13,7 +17,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50">{children}</body>
+      <body>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
     </html>
   )
 }

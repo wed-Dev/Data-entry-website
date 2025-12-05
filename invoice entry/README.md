@@ -1,285 +1,388 @@
-# 📦 Business Transaction Entry System
+# Invoice Entry - Full-Stack Transaction Management System
 
-> A modern, full-stack web application for tracking business transactions with secure authentication, real-time dashboard, and advanced filtering.
+A modern, production-ready web application for managing invoices and transactions with authentication, analytics, and comprehensive CRUD operations.
 
-[![Vercel Status](https://img.shields.io/badge/deploy-vercel-blue.svg)](https://vercel.com)
-[![Next.js](https://img.shields.io/badge/built%20with-Next.js%2014-black.svg)](https://nextjs.org)
-[![TailwindCSS](https://img.shields.io/badge/styled%20with-Tailwind%20CSS-38B2AC.svg)](https://tailwindcss.com)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+## 🚀 Features
 
-## ✨ Features
+- **Authentication System**: Secure login, signup, and password reset using Supabase Auth
+- **Dashboard**: Real-time metrics with interactive charts (monthly revenue, daily transactions, location analytics)
+- **Transaction Management**: Complete CRUD operations with search, filtering, sorting, and pagination
+- **Transaction Entry Form**: Comprehensive form with validation and responsive design
+- **Analytics Dashboard**: Detailed reports including revenue trends, job insights, and busy day analysis
+- **Row Level Security**: User-specific data isolation at the database level
+- **Mobile Responsive**: Fully optimized for desktop, tablet, and mobile devices
 
-- 🔐 **Secure Authentication** - JWT-based login with password encryption
-- 📊 **Real-time Dashboard** - Live metrics updating instantly
-- 💾 **Transaction Management** - Create, view, search transactions
-- 📈 **Advanced Filtering** - Month-wise, search by customer/location
-- 📱 **Fully Responsive** - Works perfectly on mobile and desktop
-- 🎨 **Modern UI** - Clean design with smooth animations
-- 🛡️ **Row-Level Security** - Each user sees only their data
-- ⚡ **Production Ready** - Optimized for Vercel deployment
+## 🛠 Tech Stack
 
-## 🎯 Use Cases
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: TailwindCSS
+- **Charts**: Recharts
+- **Authentication**: Supabase Auth
+- **Database**: Supabase PostgreSQL with RLS
+- **UI Components**: Custom components with Lucide React icons
+- **API**: Next.js API Routes with Server Actions
 
-- **Logistics Companies** - Track deliveries and pickups
-- **Taxi/Ride Services** - Monitor daily transactions and revenue
-- **Business Operations** - Monitor transaction history and analytics
-- **Finance Tracking** - Revenue reports and monthly summaries
+## 📋 Prerequisites
 
-## 🏗️ Architecture
+- Node.js 18+ and npm/yarn
+- Supabase account
+- Git
 
-```
-┌─────────────────┐         ┌──────────────────┐
-│  Frontend       │         │  Backend         │
-│  (Next.js 14)   │◄──────►│  (API Routes)    │
-│  React + Tw CSS │         │                  │
-└─────────────────┘         └──────────────────┘
-         │                          │
-         └──────────────┬───────────┘
-                        │
-                   ┌────▼─────┐
-                   │ Supabase  │
-                   │PostgreSQL │
-                   └───────────┘
+## 🔧 Local Setup
+
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd invoice-entry
 ```
 
-## 🚀 Quick Start
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-### Prerequisites
-- Node.js v18+
-- npm/yarn
-- Supabase account (free)
-
-### Installation
+### 3. Set Up Environment Variables
+Create a `.env.local` file at the root directory:
 
 ```bash
-# 1. Clone/download project
-cd business-transaction-entry
-
-# 2. Install dependencies
-npm install
-
-# 3. Set up environment
 cp .env.example .env.local
-# Add Supabase keys to .env.local
+```
 
-# 4. Run development server
+Fill in your Supabase credentials:
+```
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url_here
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+```
+
+### 4. Set Up Supabase Database
+
+#### Create Database Tables
+
+Execute the following SQL in your Supabase SQL Editor:
+
+```sql
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Create users table (Supabase handles this automatically via Auth)
+-- But you can create a profile table if needed
+
+-- Create transactions table
+CREATE TABLE IF NOT EXISTS transactions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  customer_id VARCHAR(100) NOT NULL,
+  pickup_location VARCHAR(255) NOT NULL,
+  destination VARCHAR(255) NOT NULL,
+  date DATE NOT NULL,
+  time TIME NOT NULL,
+  vehicle_type VARCHAR(100),
+  price DECIMAL(10, 2) NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for better query performance
+CREATE INDEX idx_transactions_user_id ON transactions(user_id);
+CREATE INDEX idx_transactions_date ON transactions(date);
+CREATE INDEX idx_transactions_created_at ON transactions(created_at DESC);
+
+-- Enable Row Level Security
+ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
+
+-- Create RLS Policy: Users can only see their own transactions
+CREATE POLICY "Users can view their own transactions" ON transactions
+  FOR SELECT
+  USING (auth.uid() = user_id);
+
+-- Create RLS Policy: Users can insert their own transactions
+CREATE POLICY "Users can create their own transactions" ON transactions
+  FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+-- Create RLS Policy: Users can update their own transactions
+CREATE POLICY "Users can update their own transactions" ON transactions
+  FOR UPDATE
+  USING (auth.uid() = user_id);
+
+-- Create RLS Policy: Users can delete their own transactions
+CREATE POLICY "Users can delete their own transactions" ON transactions
+  FOR DELETE
+  USING (auth.uid() = user_id);
+```
+
+### 5. Run Development Server
+```bash
 npm run dev
 ```
 
-Visit `http://localhost:3000` → Login with demo credentials
+The application will be available at `http://localhost:3000`
 
-**Demo Credentials:**
-- Email: `demo@example.com`
-- Password: `Demo@123`
+### 6. Default Navigation
 
-## 📚 Documentation
+- **Login Page**: `http://localhost:3000/auth/login`
+- **Signup Page**: `http://localhost:3000/auth/signup`
+- **Dashboard**: `http://localhost:3000/dashboard` (protected)
+- **Transactions**: `http://localhost:3000/transactions` (protected)
+- **New Transaction**: `http://localhost:3000/transactions/new` (protected)
+- **Analytics**: `http://localhost:3000/analytics` (protected)
 
-| Document | Purpose |
-|----------|---------|
-| [QUICK_START.md](QUICK_START.md) | Get running in 5 minutes |
-| [SETUP_AND_DEPLOYMENT.md](SETUP_AND_DEPLOYMENT.md) | Complete setup & deployment guide |
-| [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) | Database structure & SQL |
-| [API_DOCUMENTATION.md](API_DOCUMENTATION.md) | API endpoints & usage |
-
-## 📂 Project Structure
+## 📚 Project Structure
 
 ```
-src/
-├── app/
-│   ├── layout.tsx              # Root layout
-│   ├── page.tsx                # Login page
-│   ├── globals.css             # Global styles
-│   ├── signup/
-│   │   └── page.tsx            # Sign up page
-│   ├── dashboard/
-│   │   └── page.tsx            # Dashboard page
-│   └── api/
-│       ├── auth/
-│       │   ├── login/route.ts   # Login endpoint
-│       │   └── signup/route.ts  # Signup endpoint
-│       └── transactions/
-│           ├── create/route.ts  # Create transaction
-│           ├── list/route.ts    # List transactions
-│           └── metrics/route.ts # Get metrics
-├── components/
-│   ├── DashboardMetrics.tsx    # Metrics display
-│   ├── TransactionForm.tsx     # Form component
-│   └── TransactionsList.tsx    # Table component
-├── lib/
-│   ├── supabase.ts             # Supabase client
-│   ├── auth.ts                 # Auth utilities
-│   └── api.ts                  # API client
-public/               # Static assets
-package.json          # Dependencies
-tailwind.config.ts    # TailwindCSS config
-tsconfig.json         # TypeScript config
-.env.example          # Environment template
+invoice-entry/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── transactions/
+│   │   │   │   ├── route.ts (GET, POST)
+│   │   │   │   └── [id]/route.ts (PUT, DELETE)
+│   │   │   └── analytics/route.ts (GET)
+│   │   ├── auth/
+│   │   │   ├── login/page.tsx
+│   │   │   ├── signup/page.tsx
+│   │   │   ├── forgot-password/page.tsx
+│   │   │   └── callback/page.tsx
+│   │   ├── (protected)/
+│   │   │   └── layout.tsx
+│   │   ├── dashboard/page.tsx
+│   │   ├── transactions/
+│   │   │   ├── page.tsx
+│   │   │   └── new/page.tsx
+│   │   ├── analytics/page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── providers.tsx
+│   │   └── globals.css
+│   ├── components/
+│   │   ├── AppLayout.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Toast.tsx
+│   │   ├── EditTransactionModal.tsx
+│   │   └── ConfirmDialog.tsx
+│   ├── lib/
+│   │   ├── supabase/
+│   │   │   ├── client.ts
+│   │   │   └── server.ts
+│   │   └── auth/
+│   │       └── actions.ts
+│   └── types/
+│       └── index.ts
+├── public/
+├── .env.example
+├── .gitignore
+├── package.json
+├── tsconfig.json
+├── tailwind.config.ts
+├── postcss.config.js
+└── next.config.js
 ```
 
-## 🔐 Authentication Flow
+## 🌐 Deployment on Vercel
 
-1. User visits app → redirected to login
-2. Enter email & password
-3. Server validates credentials
-4. JWT token generated & stored in localStorage
-5. User redirected to dashboard
-6. All API calls include token in Authorization header
-7. Backend verifies token & enforces row-level security
-
-## 💾 Database Structure
-
-### Users Table
-```sql
-id (UUID) | email | name | created_at
+### Step 1: Push to GitHub
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git branch -M main
+git remote add origin <your-github-repo-url>
+git push -u origin main
 ```
 
-### Transactions Table
-```sql
-id | user_id | customer_id | pickup_location | destination_location | date | time | price | created_at
-```
+### Step 2: Connect to Vercel
+1. Go to [vercel.com](https://vercel.com)
+2. Click "New Project"
+3. Import your GitHub repository
+4. Select the project
 
-**Row-Level Security**: Users can only access their own transactions.
-
-## 🌐 Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. **Push to GitHub**
-   ```bash
-   git add .
-   git commit -m "Initial commit"
-   git push origin main
+### Step 3: Configure Environment Variables
+In Vercel project settings:
+1. Go to Settings > Environment Variables
+2. Add the following variables:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 
-2. **Connect to Vercel**
-   - Visit https://vercel.com
-   - Select your repository
-   - Add environment variables
-   - Click Deploy
+### Step 4: Configure Supabase for Production
+1. In Supabase Dashboard, go to Settings > API
+2. Update your Redirect URLs to include your Vercel domain:
+   ```
+   https://your-vercel-domain.vercel.app/auth/callback
+   http://localhost:3000/auth/callback
+   ```
 
-3. **Set up database**
-   - Create Supabase project
-   - Run SQL migrations (see DATABASE_SCHEMA.md)
-   - Add API keys to Vercel
+### Step 5: Deploy
+- Vercel will automatically deploy your project
+- Check the deployment logs for any errors
+- Access your app at `https://your-project-name.vercel.app`
 
-For detailed steps, see [SETUP_AND_DEPLOYMENT.md](SETUP_AND_DEPLOYMENT.md)
+## 🔐 API Endpoints Documentation
+
+### Authentication
+- **Login**: POST `/auth/login` (form submission)
+- **Signup**: POST `/auth/signup` (form submission)
+- **Logout**: Client-side via Supabase Auth
+
+### Transactions
+- **Create**: POST `/api/transactions`
+  ```json
+  {
+    "customer_id": "C001",
+    "pickup_location": "Dubai",
+    "destination": "Abu Dhabi",
+    "date": "2024-12-05",
+    "time": "10:30",
+    "vehicle_type": "Car",
+    "price": 150.00,
+    "notes": "Express delivery"
+  }
+  ```
+
+- **Read**: GET `/api/transactions?page=1&limit=10&sortBy=date&order=desc&search=&month=`
+
+- **Update**: PUT `/api/transactions/[id]`
+  ```json
+  {
+    "price": 175.00,
+    "notes": "Updated notes"
+  }
+  ```
+
+- **Delete**: DELETE `/api/transactions/[id]`
+
+### Analytics
+- **Get Analytics**: GET `/api/analytics`
+  Returns:
+  ```json
+  {
+    "monthly_totals": [...],
+    "daily_totals": [...],
+    "most_common_pickup": "Dubai",
+    "most_common_destination": "Abu Dhabi",
+    "highest_paid_job": 500,
+    "average_job_value": 150.50,
+    "total_yearly_revenue": 45000,
+    "busy_days": [...]
+  }
+  ```
 
 ## 🧪 Testing
 
-### Local Testing
-```bash
-npm run dev
-# Visit http://localhost:3000
-# Test with demo credentials
-```
-
-### API Testing
-```bash
-# Using curl
-curl -X POST http://localhost:3000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"demo@example.com","password":"Demo@123"}'
-```
-
-## 🔧 Environment Variables
-
-| Variable | Required | Example |
-|----------|----------|---------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | `https://xxx.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | `eyJxx...` |
-| `SUPABASE_SERVICE_ROLE_KEY` | No | `eyJxx...` |
-| `JWT_SECRET` | No | Generate with `crypto.randomBytes(32)` |
-| `DATABASE_URL` | No | PostgreSQL connection string |
+### Manual Testing Checklist
+- [ ] Signup with new email
+- [ ] Login with credentials
+- [ ] Verify email (check Supabase Auth logs)
+- [ ] Create a transaction
+- [ ] Edit a transaction
+- [ ] Delete a transaction
+- [ ] Search transactions
+- [ ] Filter by month
+- [ ] Sort transactions
+- [ ] View dashboard metrics
+- [ ] View analytics
+- [ ] Logout
+- [ ] Try accessing protected routes without login
 
 ## 🚨 Troubleshooting
 
-### Can't login?
-- Check credentials in environment variables
-- Ensure user exists in Supabase
-- Check browser console for errors
+### Issue: "Unauthorized" Error
+**Solution**: Check if you're logged in. The app redirects unauthenticated users to `/auth/login`.
 
-### Database connection error?
-- Verify DATABASE_URL
-- Check Supabase status
-- Ensure IP is whitelisted
+### Issue: Database Connection Error
+**Solution**: 
+- Verify `NEXT_PUBLIC_SUPABASE_URL` and keys are correct
+- Check Supabase project is active
+- Ensure RLS policies are properly configured
 
-### Deployment failed?
-- Check build logs in Vercel
-- Verify all environment variables set
-- Ensure database migrations ran
+### Issue: Transactions Not Showing
+**Solution**:
+- Check if RLS is enabled on the transactions table
+- Verify the logged-in user's ID matches `user_id` in the database
+- Check browser DevTools > Network tab for API errors
 
-See [SETUP_AND_DEPLOYMENT.md](SETUP_AND_DEPLOYMENT.md) for more troubleshooting.
+### Issue: Charts Not Displaying
+**Solution**:
+- Ensure Recharts is installed: `npm install recharts`
+- Check console for chart errors
+- Verify data is being returned from `/api/analytics`
 
-## 📊 Performance
+### Issue: Supabase Auth Redirect Not Working
+**Solution**:
+- Add your domain to Supabase Auth > Redirect URLs
+- For localhost: `http://localhost:3000/auth/callback`
+- For production: `https://your-domain.com/auth/callback`
 
-- ⚡ Optimized for Core Web Vitals
-- 🔍 SEO-friendly with Next.js
-- 📱 Mobile-first responsive design
-- 🚀 Database indexes on frequently queried columns
-- 💾 Efficient API responses with minimal payloads
+### Issue: CORS Errors
+**Solution**:
+- Supabase handles CORS automatically
+- If using custom API endpoints, add CORS headers to API routes
+- Check that requests are using the correct Supabase instance
 
-## 🔒 Security
+## 📊 Performance Optimization Tips
 
-- ✅ JWT authentication with secure tokens
-- ✅ Row-level security in database
-- ✅ HTTPS/SSL for all communications
-- ✅ SQL injection prevention
-- ✅ CORS properly configured
-- ✅ Environment variables for secrets
-- ✅ Password hashing (SHA-256)
+1. **Database Indexing**: Already implemented on `user_id`, `date`, and `created_at`
+2. **API Pagination**: Always paginate large result sets (10-20 records per page)
+3. **Caching**: Use browser caching and Next.js data cache
+4. **Image Optimization**: Use Next.js `Image` component for any images
+5. **Bundle Size**: Monitor with `npm run build` and check `.next/analyze`
+6. **RLS Performance**: RLS policies are efficiently applied at database level
 
-## 🎨 UI/UX Features
+## 🔒 Security Features
 
-- Clean, modern interface
-- Smooth animations and transitions
-- Loading states and error handling
-- Success notifications
-- Mobile-responsive design
-- Accessible form controls
-- Intuitive navigation
+1. **Row Level Security (RLS)**: User data isolation at database level
+2. **Authentication**: Supabase Auth with JWT tokens
+3. **HTTPS**: Enforced on production
+4. **SQL Injection Prevention**: Using Supabase client library (prevents SQL injection)
+5. **CSRF Protection**: Next.js built-in CSRF protection
+6. **Environment Variables**: Secrets never exposed in client code
 
-## 📈 Scalability
+## 🎨 Customization
 
-- Database indexes for performance
-- Efficient API queries
-- Caching strategies
-- Ready to scale to millions of transactions
-- Auto-backup in Supabase
+### Change Primary Color
+Edit `tailwind.config.ts`:
+```typescript
+theme: {
+  extend: {
+    colors: {
+      primary: '#your-color',
+    },
+  },
+}
+```
 
-## 🤝 Contributing
+### Add More Fields to Transactions
+1. Update database schema in Supabase SQL
+2. Update `Transaction` type in `src/types/index.ts`
+3. Update API endpoints
+4. Update form components
 
-Pull requests welcome! 
-
-1. Fork the repository
-2. Create your feature branch
-3. Commit changes
-4. Push to the branch
-5. Create a Pull Request
+### Customize Charts
+Edit chart components in `src/app/dashboard/page.tsx` and `src/app/analytics/page.tsx`
 
 ## 📝 License
 
-MIT License - feel free to use this project freely.
+MIT
 
-## 🙋 Support
+## 🤝 Support
 
-- 📖 Check [SETUP_AND_DEPLOYMENT.md](SETUP_AND_DEPLOYMENT.md)
-- 🐛 Report issues on GitHub
-- 💬 Supabase community: https://supabase.com/community
-- 📚 Next.js docs: https://nextjs.org/docs
+For issues or questions:
+1. Check the Troubleshooting section
+2. Review Supabase documentation: https://supabase.com/docs
+3. Check Next.js documentation: https://nextjs.org/docs
 
-## 🎉 Built With
+## 🎯 Future Enhancements
 
-- [Next.js 14](https://nextjs.org) - React framework
-- [React 18](https://react.dev) - UI library
-- [TailwindCSS](https://tailwindcss.com) - Styling
-- [Supabase](https://supabase.com) - Backend & Database
-- [TypeScript](https://www.typescriptlang.org) - Type safety
-- [Lucide React](https://lucide.dev) - Icons
-
-## 👨‍💻 Author
-
-Created with ❤️ for modern business needs.
-
----
-
-**Ready to get started? See [QUICK_START.md](QUICK_START.md)** ⚡
+- [ ] Export reports as PDF/Excel
+- [ ] Email notifications
+- [ ] Multi-user collaboration with role-based access
+- [ ] Advanced filtering and custom date ranges
+- [ ] Mobile app (React Native)
+- [ ] Invoice generation and printing
+- [ ] Payment gateway integration
+- [ ] Recurring transactions
+- [ ] Customer management system

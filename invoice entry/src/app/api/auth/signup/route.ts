@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseServer } from '@/lib/supabase'
-import { signToken } from '@/lib/auth'
-import { hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
+import { connectToDatabase } from '@/lib/mongodb/connection'
+import { User } from '@/lib/mongodb/models/User'
 
-export async function POST(req: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
-    const { email, password, name } = await req.json()
+    const body = await request.json()
+    const { email, password, name } = body
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password required' },
+        { error: 'Email and password are required' },
         { status: 400 }
       )
     }
@@ -21,49 +22,58 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const password_hash = await hash(password, 10)
-    const supabase = supabaseServer()
-
-    // Check if email already exists
-    const { data: existing, error: existingErr } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle()
-
-    if (existingErr) {
-      console.error('Check existing error:', existingErr)
-      return NextResponse.json({ error: existingErr.message }, { status: 500 })
+    // Try to connect to MongoDB
+    try {
+      await connectToDatabase()
+    } catch (dbError: any) {
+      console.error('Database connection failed:', dbError.message)
+      return NextResponse.json(
+        { 
+          error: 'Database connection failed. Please ensure MongoDB is running.',
+          details: 'Install MongoDB from https://www.mongodb.com/try/download/community or run: docker run -d -p 27017:27017 mongo'
+        },
+        { status: 503 }
+      )
     }
 
-    if (existing) {
-      return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
+    // Check if user already exists
+    const existingUser = await User.findOne({ email: email.toLowerCase() })
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'User with this email already exists' },
+        { status: 400 }
+      )
     }
 
-    // Insert new user
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{ email, password_hash }])
-      .select('id, email')
-      .single()
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
 
-    if (error || !data) {
-      console.error('Insert user error:', error)
-      return NextResponse.json({ error: error?.message || 'Signup failed' }, { status: 500 })
-    }
-
-    const token = signToken({ sub: data.id, email: data.email })
+    // Create user
+    const user = await User.create({
+      email: email.toLowerCase(),
+      password: hashedPassword,
+      name: name || email,
+    })
 
     return NextResponse.json(
       {
-        token,
-        user_id: data.id,
-        email: data.email,
+        message: 'User created successfully',
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name,
+        },
       },
       { status: 201 }
     )
-  } catch (err) {
-    console.error('Signup error:', err)
-    return NextResponse.json({ error: 'Signup failed' }, { status: 500 })
+  } catch (error: any) {
+    console.error('Signup error:', error)
+    return NextResponse.json(
+      { 
+        error: 'Failed to create account',
+        details: error.message || 'Internal server error'
+      },
+      { status: 500 }
+    )
   }
 }

@@ -1,11 +1,11 @@
+.env.local
+.env
 node_modules
 .next
+build
 dist
 out
-build
 *.log
 .DS_Store
-.env.local
-.env.*.local
-.vercel
-.turbo
+.vscode
+.idea
