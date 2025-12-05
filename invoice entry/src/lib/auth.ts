@@ -1,56 +1,58 @@
 // Authentication utilities
-import crypto from 'crypto'
+import jwt from 'jsonwebtoken'
+import type { AuthPayload } from '@/types/transactions'
 
+const JWT_SECRET = process.env.JWT_SECRET || ''
+
+// Sign JWT token
+export function signToken(payload: AuthPayload): string {
+  if (!JWT_SECRET) throw new Error('JWT_SECRET missing')
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
+}
+
+// Verify JWT token
+export function verifyToken(token?: string): AuthPayload | null {
+  if (!token || !JWT_SECRET) return null
+  try {
+    return jwt.verify(token, JWT_SECRET) as AuthPayload
+  } catch {
+    return null
+  }
+}
+
+// Extract Bearer token from Authorization header
+export function getTokenFromHeader(header?: string | null): string | null {
+  if (!header) return null
+  const [type, token] = header.split(' ')
+  return type === 'Bearer' && token ? token : null
+}
+
+// Store auth data in localStorage (client-side)
+export function storeAuthData(token: string, userId: string, email: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('auth_token', token)
+    localStorage.setItem('user_id', userId)
+    localStorage.setItem('user_email', email)
+  }
+}
+
+// Get auth data from localStorage
 export interface AuthToken {
   token: string
   userId: string
   email: string
 }
 
-// Generate JWT-like token (simple implementation)
-export function generateToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-// Hash password (SHA-256 - use bcrypt in production)
-export function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex')
-}
-
-// Verify token (simple check)
-export function verifyToken(token: string): boolean {
-  return !!token && token.length > 0
-}
-
-// Get token from request
-export function getTokenFromRequest(authHeader: string | null): string | null {
-  if (!authHeader) return null
-  const parts = authHeader.split(' ')
-  return parts.length === 2 && parts[0] === 'Bearer' ? parts[1] : null
-}
-
-// Store auth data in localStorage
-export function storeAuthData(token: string, userId: string): void {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('auth_token', token)
-    localStorage.setItem('user_id', userId)
-  }
-}
-
-// Get auth data from localStorage
 export function getAuthData(): AuthToken | null {
   if (typeof window === 'undefined') return null
-  
+
   const token = localStorage.getItem('auth_token')
   const userId = localStorage.getItem('user_id')
-  
+  const email = localStorage.getItem('user_email')
+
   if (!token || !userId) return null
-  
-  return {
-    token,
-    userId,
-    email: localStorage.getItem('remembered_email') || '',
-  }
+
+  return { token, userId, email: email || '' }
 }
 
 // Clear auth data
@@ -58,8 +60,9 @@ export function clearAuthData(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('auth_token')
     localStorage.removeItem('user_id')
-    localStorage.removeItem('remembered_email')
+    localStorage.removeItem('user_email')
     localStorage.removeItem('remember_me')
+    localStorage.removeItem('remembered_email')
   }
 }
 

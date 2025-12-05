@@ -1,47 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
+import { supabaseServer } from '@/lib/supabase'
+import { signToken } from '@/lib/auth'
+import { hash } from 'bcryptjs'
 
-// In-memory storage (replace with database in production)
-let users: Array<{
-  id: string
-  name: string
-  email: string
-  password: string
-}> = [
-  {
-    id: 'user_demo_001',
-    name: 'Demo User',
-    email: 'demo@example.com',
-    password: '$2a$12$demo_hashed_password',
-  },
-]
-
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex')
-}
-
-function generateToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-function generateUserId(): string {
-  return 'user_' + crypto.randomBytes(8).toString('hex')
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const { name, email, password } = await request.json()
+    const { email, password, name } = await req.json()
 
-    if (!name || !email || !password) {
+    if (!email || !password || !name) {
       return NextResponse.json(
-        { error: 'Name, email, and password required' },
+        { error: 'Email, password, and name required' },
         { status: 400 }
       )
-    }
-
-    // Check if user already exists
-    if (users.find((u) => u.email === email)) {
-      return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
     }
 
     if (password.length < 6) {
@@ -51,26 +21,50 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const userId = generateUserId()
-    const passwordHash = hashPassword(password)
+    const password_hash = await hash(password, 10)
+    const supabase = supabaseServer()
 
-    users.push({
-      id: userId,
-      name,
-      email,
-      password: passwordHash,
-    })
+    // Check if email already exists
+    const { data: existing, error: existingErr } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
 
-    const token = generateToken()
+    if (existingErr) {
+      console.error('Check existing error:', existingErr)
+      return NextResponse.json({ error: existingErr.message }, { status: 500 })
+    }
+
+    if (existing) {
+      return NextResponse.json({ error: 'Email already registered' }, { status: 400 })
+    }
+
+    // Insert new user
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ email, password_hash, name }])
+      .select('id, email')
+      .single()
+
+    if (error || !data) {
+      console.error('Insert user error:', error)
+      return NextResponse.json({ error: error?.message || 'Signup failed' }, { status: 500 })
+    }
+
+    const token = signToken({ sub: data.id, email: data.email })
+
     return NextResponse.json(
       {
         token,
-        user_id: userId,
+        user_id: data.id,
+        email: data.email,
         name,
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (err) {
+    console.error('Signup error:', err)
     return NextResponse.json({ error: 'Signup failed' }, { status: 500 })
   }
 }

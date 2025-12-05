@@ -1,67 +1,52 @@
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
+import { supabaseServer } from '@/lib/supabase'
+import { signToken } from '@/lib/auth'
+import { compare } from 'bcryptjs'
 
-// In-memory storage (replace with database in production)
-let users: Array<{
-  id: string
-  name: string
-  email: string
-  password: string
-}> = [
-  {
-    id: 'user_demo_001',
-    name: 'Demo User',
-    email: 'demo@example.com',
-    password: '$2a$12$demo_hashed_password', // Demo@123 hashed
-  },
-]
-
-// Simple hash function (use bcrypt in production)
-function hashPassword(password: string): string {
-  return crypto.createHash('sha256').update(password).digest('hex')
-}
-
-function generateToken(): string {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await request.json()
+    const { email, password } = await req.json()
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 })
     }
 
-    const user = users.find((u) => u.email === email)
+    const supabase = supabaseServer()
 
-    // For demo purposes, allow login with demo@example.com / Demo@123
-    if (email === 'demo@example.com' && password === 'Demo@123') {
-      const token = generateToken()
-      return NextResponse.json({
-        token,
-        user_id: users[0].id,
-        name: users[0].name,
-      })
+    // Get user by email
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, email, password_hash, name')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (error) {
+      console.error('User lookup error:', error)
+      return NextResponse.json({ error: 'Login failed' }, { status: 500 })
     }
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    // In production, use bcrypt.compare()
-    const passwordHash = hashPassword(password)
-    if (user.password !== passwordHash) {
+    // Compare password
+    const isValidPassword = await compare(password, user.password_hash)
+
+    if (!isValidPassword) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 })
     }
 
-    const token = generateToken()
+    // Sign JWT token
+    const token = signToken({ sub: user.id, email: user.email })
+
     return NextResponse.json({
       token,
       user_id: user.id,
+      email: user.email,
       name: user.name,
     })
-  } catch (error) {
+  } catch (err) {
+    console.error('Login error:', err)
     return NextResponse.json({ error: 'Login failed' }, { status: 500 })
   }
 }
