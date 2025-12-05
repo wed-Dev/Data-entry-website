@@ -4,7 +4,9 @@ import { getTokenFromHeader, verifyToken } from '@/lib/auth'
 
 export async function POST(req: NextRequest) {
   try {
-    const token = verifyToken(getTokenFromHeader(req.headers.get('authorization')))
+    const authHeader = req.headers.get('authorization')
+    const tokenStr = getTokenFromHeader(authHeader)
+    const token = verifyToken(tokenStr || undefined)
 
     if (!token) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
