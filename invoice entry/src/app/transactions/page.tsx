@@ -27,10 +27,6 @@ export default function TransactionsPage() {
 
   const limit = 10
 
-  useEffect(() => {
-    fetchTransactions()
-  }, [searchTerm, monthFilter, sortBy, sortOrder, page])
-
   const fetchTransactions = async () => {
     setLoading(true)
     try {
@@ -53,6 +49,11 @@ export default function TransactionsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    fetchTransactions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm, monthFilter, sortBy, sortOrder, page])
 
   const handleEdit = (transaction: Transaction) => {
     setEditingTransaction(transaction)
@@ -205,8 +206,8 @@ export default function TransactionsPage() {
                 <tbody className="divide-y divide-gray-200">
                   {transactions.map((transaction) => (
                     <tr key={transaction.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm text-gray-900">{transaction.customer_id}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{transaction.pickup_location}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">{transaction.customerId}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{transaction.pickupLocation}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{transaction.destination}</td>
                       <td className="px-6 py-4 text-sm text-gray-600">{transaction.date}</td>
                       <td className="px-6 py-4 text-sm text-right font-semibold text-gray-900">

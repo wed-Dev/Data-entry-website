@@ -49,8 +49,8 @@ export function EditTransactionModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">Customer ID</label>
             <input
               type="text"
-              name="customer_id"
-              defaultValue={transaction.customer_id}
+              name="customerId"
+              defaultValue={transaction.customerId}
               onChange={handleChange}
               className="input-field"
               required
@@ -72,8 +72,8 @@ export function EditTransactionModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">Pickup Location</label>
             <input
               type="text"
-              name="pickup_location"
-              defaultValue={transaction.pickup_location}
+              name="pickupLocation"
+              defaultValue={transaction.pickupLocation}
               onChange={handleChange}
               className="input-field"
               required
@@ -116,8 +116,8 @@ export function EditTransactionModal({
             <label className="block text-sm font-medium text-gray-700 mb-1">Vehicle Type</label>
             <input
               type="text"
-              name="vehicle_type"
-              defaultValue={transaction.vehicle_type || ''}
+              name="vehicleType"
+              defaultValue={transaction.vehicleType || ''}
               onChange={handleChange}
               className="input-field"
             />

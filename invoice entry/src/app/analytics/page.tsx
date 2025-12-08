@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => `AED ${value.toFixed(2)}`} />
+                <Tooltip formatter={(value) => `AED ${Number(value).toFixed(2)}`} />
                 <Line type="monotone" dataKey="total" stroke="#3B82F6" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
