@@ -4,7 +4,7 @@ import { signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ReactNode } from 'react'
 import Link from 'next/link'
-import { LogOut, Home, DollarSign, BarChart3 } from 'lucide-react'
+import { LogOut, Home, DollarSign, BarChart3, FileText } from 'lucide-react'
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -31,6 +31,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <DollarSign size={20} />
                   <span>Transactions</span>
                 </Link>
+                <Link href="/invoice" className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors">
+                  <FileText size={20} />
+                  <span>Car Invoice</span>
+                </Link>
                 <Link href="/analytics" className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors">
                   <BarChart3 size={20} />
                   <span>Analytics</span>
@@ -47,10 +51,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex gap-2 pb-4">
-            <Link href="/dashboard" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Dashboard</Link>
-            <Link href="/transactions" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Transactions</Link>
-            <Link href="/analytics" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded">Analytics</Link>
+          <div className="md:hidden flex gap-2 pb-4 overflow-x-auto">
+            <Link href="/dashboard" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap">Dashboard</Link>
+            <Link href="/transactions" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap">Transactions</Link>
+            <Link href="/invoice" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap">Car Invoice</Link>
+            <Link href="/analytics" className="flex-1 text-center py-2 text-sm text-gray-700 hover:bg-gray-100 rounded whitespace-nowrap">Analytics</Link>
           </div>
         </div>
       </nav>
