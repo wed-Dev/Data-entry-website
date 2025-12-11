@@ -144,154 +144,46 @@ export default function InvoicePage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <>
         <style dangerouslySetInnerHTML={{__html: `
-          /* Print Styles */
           @media print {
-            .no-print {
-              display: none !important;
-            }
-            
-            .invoice-container {
-              max-width: 100% !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              border: 4px solid #000 !important;
-              page-break-after: avoid;
-              page-break-inside: avoid;
-            }
-            
-            .invoice-header {
-              page-break-after: avoid;
-              page-break-inside: avoid;
-            }
-            
-            .invoice-table {
-              page-break-inside: avoid;
-            }
-            
-            input {
-              border: none !important;
-              background: transparent !important;
-              -webkit-appearance: none !important;
-            }
-            
-            .header-section {
-              display: flex !important;
-              justify-content: space-between !important;
-              align-items: flex-start !important;
-              flex-wrap: nowrap !important;
-            }
-            
-            .header-left,
-            .header-center,
-            .header-right {
-              flex-shrink: 0;
-            }
-            
-            .header-left {
-              width: 30%;
-              text-align: left;
-            }
-            
-            .header-center {
-              width: 30%;
-              display: flex;
-              justify-content: center;
-              align-items: flex-start;
-            }
-            
-            .header-right {
-              width: 30%;
-              text-align: right;
-            }
-            
-            table {
-              border-collapse: collapse !important;
-              width: 100% !important;
-            }
-            
-            th, td {
-              page-break-inside: avoid;
-            }
-            
-            @page {
-              margin: 1cm;
-              size: A4;
-            }
+            .no-print { display: none !important; }
+            .invoice-container { max-width: 100% !important; margin: 0 !important; padding: 0 !important; border: 4px solid #000 !important; page-break-after: avoid; page-break-inside: avoid; }
+            .invoice-header { page-break-after: avoid; page-break-inside: avoid; }
+            .invoice-table { page-break-inside: avoid; }
+            input { border: none !important; background: transparent !important; -webkit-appearance: none !important; }
+            .header-section { display: flex !important; justify-content: space-between !important; align-items: flex-start !important; flex-wrap: nowrap !important; }
+            .header-left, .header-center, .header-right { flex-shrink: 0; }
+            .header-left { width: 30%; text-align: left; }
+            .header-center { width: 30%; display: flex; justify-content: center; align-items: flex-start; }
+            .header-right { width: 30%; text-align: right; }
+            table { border-collapse: collapse !important; width: 100% !important; }
+            th, td { page-break-inside: avoid; }
+            @page { margin: 1cm; size: A4; }
           }
-          
-          /* Responsive Media Queries */
           @media screen and (max-width: 1024px) {
-            .invoice-container {
-              max-width: 95% !important;
-            }
+            .invoice-container { max-width: 95% !important; }
           }
-          
           @media screen and (max-width: 768px) {
-            .header-section {
-              flex-direction: column !important;
-              gap: 1rem;
-            }
-            
-            .header-left,
-            .header-center,
-            .header-right {
-              width: 100% !important;
-              text-align: center !important;
-            }
-            
-            .grid-cols-2 {
-              grid-template-columns: 1fr !important;
-            }
-            
-            .invoice-container h1,
-            .invoice-container h2 {
-              font-size: 1.25rem !important;
-            }
-            
-            .invoice-container p {
-              font-size: 1rem !important;
-            }
-            
-            table {
-              font-size: 0.75rem !important;
-            }
-            
-            th, td {
-              padding: 0.25rem !important;
-            }
+            .header-section { flex-direction: column !important; gap: 1rem; }
+            .header-left, .header-center, .header-right { width: 100% !important; text-align: center !important; }
+            .grid-cols-2 { grid-template-columns: 1fr !important; }
+            .invoice-container h1, .invoice-container h2 { font-size: 1.25rem !important; }
+            .invoice-container p { font-size: 1rem !important; }
+            table { font-size: 0.75rem !important; }
+            th, td { padding: 0.25rem !important; }
           }
-          
           @media screen and (max-width: 480px) {
-            .invoice-container {
-              border-width: 2px !important;
-            }
-            
-            .invoice-container h1,
-            .invoice-container h2 {
-              font-size: 1rem !important;
-            }
-            
-            .invoice-container p {
-              font-size: 0.875rem !important;
-            }
-            
-            table {
-              font-size: 0.625rem !important;
-            }
-            
-            .action-buttons {
-              flex-direction: column !important;
-              width: 100%;
-            }
-            
-            .action-buttons button {
-              width: 100%;
-            }
+            .invoice-container { border-width: 2px !important; }
+            .invoice-container h1, .invoice-container h2 { font-size: 1rem !important; }
+            .invoice-container p { font-size: 0.875rem !important; }
+            table { font-size: 0.625rem !important; }
+            .action-buttons { flex-direction: column !important; width: 100%; }
+            .action-buttons button { width: 100%; }
           }
         `}} />
 
+        <div className="space-y-6">
         {/* Action Buttons */}
         <div className="flex gap-3 justify-end action-buttons no-print">
           <button onClick={() => setShowSignatureModal(true)} className="btn-secondary flex items-center gap-2">
@@ -525,6 +417,8 @@ export default function InvoicePage() {
           </div>
         </div>
       )}
+        </div>
+      </>
     </AppLayout>
   )
 }
