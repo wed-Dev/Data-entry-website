@@ -146,7 +146,7 @@ export default function InvoicePage() {
     <AppLayout>
       <div className="space-y-6">
         {/* Print-specific styles */}
-        <style jsx global>{`
+        <style>{`
           @media print {
             body * {
               visibility: hidden;
@@ -418,6 +418,7 @@ export default function InvoicePage() {
     </AppLayout>
   )
 }
+
 
 
 
