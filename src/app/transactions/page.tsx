@@ -436,6 +436,7 @@ export default function TransactionsPage() {
 
       {showEditModal && editingTransaction && (
         <EditTransactionModal
+          isOpen={showEditModal}
           transaction={editingTransaction}
           onSave={handleSaveEdit}
           onClose={() => setShowEditModal(false)}
