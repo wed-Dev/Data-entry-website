@@ -141,13 +141,12 @@ export default function TransactionsPage() {
       })
     }
 
-    const headers = ['Date', 'Customer ID', 'Pickup', 'Destination', 'Distance (KM)', 'Price (AED)']
+    const headers = ['Date', 'Customer ID', 'Pickup', 'Destination', 'Price (AED)']
     const rows = filtered.map(t => [
       t.date,
       t.customerId,
-      t.pickup,
+      t.pickupLocation,
       t.destination,
-      t.distance,
       t.price
     ])
 
