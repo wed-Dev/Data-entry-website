@@ -145,8 +145,45 @@ export default function InvoicePage() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Print-specific styles */}
+        <style jsx global>{`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            #invoice-container, #invoice-container * {
+              visibility: visible;
+            }
+            #invoice-container {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print-grid-2 {
+              display: grid !important;
+              grid-template-columns: 1fr 1fr !important;
+              gap: 1rem !important;
+            }
+            .print-grid-2 > div {
+              break-inside: avoid !important;
+            }
+            input {
+              border: none !important;
+              border-bottom: 1px dotted #999 !important;
+            }
+          }
+          @media screen and (max-width: 640px) {
+            .print-grid-2 {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
         {/* Action Buttons */}
-        <div className="flex gap-3 justify-end">
+        <div className="flex gap-3 justify-end no-print">
           <button onClick={() => setShowSignatureModal(true)} className="btn-secondary">
             <Upload size={18} />
             Add Signature
@@ -162,7 +199,7 @@ export default function InvoicePage() {
         </div>
 
         {/* Invoice Container */}
-        <div ref={invoiceRef} className="max-w-4xl mx-auto bg-white border-4 border-black">
+        <div ref={invoiceRef} className="max-w-4xl id="invoice-container" mx-auto bg-white border-4 border-black">
           {/* Header */}
           <div className="text-center p-6 border-b-2 border-black">
             <h1 className="text-2xl font-bold text-blue-900">حامد مختار للنقل بالشاحنات الثقيلة والخفيفة (ش.ذ.م.م)</h1>
@@ -206,7 +243,7 @@ export default function InvoicePage() {
 
           {/* Customer Info */}
           <div className="p-6 border-b-2 border-black">
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print-grid-2 mb-4">
               <div>
                 <label className="font-bold">Company Name:</label>
                 <input
@@ -228,7 +265,7 @@ export default function InvoicePage() {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 print-grid-2 mb-4">
               <div>
                 <label className="font-bold">Current Location:</label>
                 <input
@@ -381,3 +418,6 @@ export default function InvoicePage() {
     </AppLayout>
   )
 }
+
+
+
