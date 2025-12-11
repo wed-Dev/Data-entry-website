@@ -445,6 +445,7 @@ export default function TransactionsPage() {
 
       {showDeleteConfirm && (
         <ConfirmDialog
+          isOpen={showDeleteConfirm}
           title="Delete Transaction"
           message="Are you sure you want to delete this transaction? This action cannot be undone."
           onConfirm={handleDelete}
