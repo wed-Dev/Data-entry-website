@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useRef, useEffect } from 'react'
 import { AppLayout } from '@/components/AppLayout'
@@ -54,10 +54,10 @@ export default function InvoicePage() {
       }
 
       await axios.post('/api/invoices', invoiceData)
-      alert('✅ Invoice saved successfully!')
+      alert('âœ… Invoice saved successfully!')
     } catch (error) {
       console.error('Error saving invoice:', error)
-      alert('❌ Error saving invoice. Please try again.')
+      alert('âŒ Error saving invoice. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -81,10 +81,10 @@ export default function InvoicePage() {
 
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST')
       pdf.save(`Invoice_${invoiceNumber}_${invoiceDate}.pdf`)
-      alert('✅ Invoice PDF downloaded!')
+      alert('âœ… Invoice PDF downloaded!')
     } catch (error) {
       console.error('Error downloading PDF:', error)
-      alert('❌ Error downloading PDF. Please try again.')
+      alert('âŒ Error downloading PDF. Please try again.')
     }
   }
 
@@ -202,7 +202,7 @@ export default function InvoicePage() {
         <div ref={invoiceRef} className="max-w-4xl id="invoice-container" mx-auto bg-white border-4 border-black">
           {/* Header */}
           <div className="text-center p-6 border-b-2 border-black">
-            <h1 className="text-2xl font-bold text-blue-900">حامد مختار للنقل بالشاحنات الثقيلة والخفيفة (ش.ذ.م.م)</h1>
+            <h1 className="text-2xl font-bold text-blue-900">Ø­Ø§Ù…Ø¯ Ù…Ø®ØªØ§Ø± Ù„Ù„Ù†Ù‚Ù„ Ø¨Ø§Ù„Ø´Ø§Ø­Ù†Ø§Øª Ø§Ù„Ø«Ù‚ÙŠÙ„Ø© ÙˆØ§Ù„Ø®ÙÙŠÙØ© (Ø´.Ø°.Ù….Ù…)</h1>
             <h2 className="text-2xl font-bold text-blue-900 mt-1">HAMID MUKHTAR HEAVY & LIGHT TRUCKS TRANSPORT (L.L.C)</h2>
             <p className="text-xl text-blue-900 mt-2">Dubai 24/7 Car Recovery & Towing Service</p>
 
@@ -220,16 +220,16 @@ export default function InvoicePage() {
               </div>
 
               <div className="border-2 border-black px-4 py-2">
-                <div className="text-sm">فاتورة نقداً / على الحساب</div>
+                <div className="text-sm">ÙØ§ØªÙˆØ±Ø© Ù†Ù‚Ø¯Ø§Ù‹ / Ø¹Ù„Ù‰ Ø§Ù„Ø­Ø³Ø§Ø¨</div>
                 <div className="text-xs font-bold">CASH / DEBIT INVOICE</div>
               </div>
 
               <div className="text-right">
                 <div className="text-sm">Email: Ahmadfarhan32304gmail.com</div>
                 <div className="font-bold">Ahmad Farhan</div>
-                <div className="text-lg font-bold">📞 +971 543881803</div>
+                <div className="text-lg font-bold">ðŸ“ž +971 543881803</div>
                 <div className="mt-2">
-                  <span className="text-sm">التاريخ Date.: </span>
+                  <span className="text-sm">Ø§Ù„ØªØ§Ø±ÙŠØ® Date.: </span>
                   <input
                     type="date"
                     value={invoiceDate}
@@ -304,23 +304,23 @@ export default function InvoicePage() {
             <thead>
               <tr className="bg-white">
                 <th className="border border-blue-900 p-2 text-xs">
-                  <div className="text-sm">الرقم</div>
+                  <div className="text-sm">Ø§Ù„Ø±Ù‚Ù…</div>
                   <div className="font-bold">Sr. No.</div>
                 </th>
                 <th className="border border-blue-900 p-2 text-xs">
-                  <div className="text-sm">التفـــاصيـــــــل</div>
+                  <div className="text-sm">Ø§Ù„ØªÙÙ€Ù€Ù€Ø§ØµÙŠÙ€Ù€Ù€Ù€Ù€Ù€Ù€Ù„</div>
                   <div className="font-bold">Description</div>
                 </th>
                 <th className="border border-blue-900 p-2 text-xs">
-                  <div className="text-sm">العدد</div>
+                  <div className="text-sm">Ø§Ù„Ø¹Ø¯Ø¯</div>
                   <div className="font-bold">Qty.</div>
                 </th>
                 <th className="border border-blue-900 p-2 text-xs">
-                  <div className="text-sm">السعر</div>
+                  <div className="text-sm">Ø§Ù„Ø³Ø¹Ø±</div>
                   <div className="font-bold">Rate</div>
                 </th>
                 <th className="border border-blue-900 p-2 text-xs">
-                  <div className="text-sm">المبلغ</div>
+                  <div className="text-sm">Ø§Ù„Ù…Ø¨Ù„Øº</div>
                   <div className="font-bold">Amount</div>
                 </th>
               </tr>
@@ -371,7 +371,7 @@ export default function InvoicePage() {
                   )}
                 </td>
                 <td colSpan={4} className="border-t-2 border-blue-900 p-3 text-right">
-                  <span className="text-sm">المجموع درهم&nbsp;&nbsp;Total Dirhams</span>
+                  <span className="text-sm">Ø§Ù„Ù…Ø¬Ù…ÙˆØ¹ Ø¯Ø±Ù‡Ù…&nbsp;&nbsp;Total Dirhams</span>
                   <div className="mt-2">
                     <input
                       type="text"
@@ -394,7 +394,7 @@ export default function InvoicePage() {
           <div className="bg-white rounded-lg max-w-2xl w-full">
             <div className="flex justify-between items-center p-4 border-b">
               <h3 className="font-bold text-lg">Draw or Upload Signature</h3>
-              <button onClick={() => setShowSignatureModal(false)} className="btn-secondary px-3 py-1">✖</button>
+              <button onClick={() => setShowSignatureModal(false)} className="btn-secondary px-3 py-1">âœ–</button>
             </div>
             <div className="p-4 bg-gray-50">
               <canvas
