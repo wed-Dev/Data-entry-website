@@ -144,7 +144,7 @@ export default function InvoicePage() {
 
   return (
     <AppLayout>
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{__html: `
         /* Print Styles */
         @media print {
           .no-print {
@@ -289,7 +289,7 @@ export default function InvoicePage() {
             width: 100%;
           }
         }
-      `}</style>
+      `}} />
 
       <div className="space-y-6">
         {/* Action Buttons */}
