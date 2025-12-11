@@ -100,62 +100,62 @@ export default function AnalyticsPage() {
   return (
     <AppLayout>
       <div className="space-y-8">
-        {/* Page Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics & Reports</h1>
-          <p className="text-gray-600 mt-1">Comprehensive business insights and performance metrics</p>
-        </div>
-
-        {/* Date Range Filter */}
-        <div className="card bg-blue-50 border-blue-200">
-          <div className="flex flex-col md:flex-row gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Calendar size={16} className="inline mr-1" />
+        {/* Page Header with Date Filter */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Analytics & Reports</h1>
+            <p className="text-gray-600 mt-1">
+              {startDate && endDate 
+                ? `Showing data from ${new Date(startDate).toLocaleDateString()} to ${new Date(endDate).toLocaleDateString()}`
+                : 'Comprehensive business insights and performance metrics'
+              }
+            </p>
+          </div>
+          
+          {/* Date Range Selector */}
+          <div className="flex flex-col sm:flex-row gap-3 items-end bg-white p-4 rounded-lg shadow-sm border">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Calendar size={14} className="inline mr-1" />
                 Start Date
               </label>
               <input
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="input-field"
+                className="input-field text-sm px-3 py-2"
               />
             </div>
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                <Calendar size={16} className="inline mr-1" />
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">
+                <Calendar size={14} className="inline mr-1" />
                 End Date
               </label>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="input-field"
+                className="input-field text-sm px-3 py-2"
               />
             </div>
             <div className="flex gap-2">
               <button
                 onClick={handleApplyFilter}
                 disabled={!startDate || !endDate || isFiltering}
-                className="btn-primary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-primary text-sm px-4 py-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isFiltering ? 'Loading...' : 'Apply Filter'}
+                {isFiltering ? 'Loading...' : 'Apply'}
               </button>
               <button
                 onClick={handleResetFilter}
                 disabled={isFiltering}
-                className="btn-secondary whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                className="btn-secondary text-sm px-3 py-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Reset Filter"
               >
-                <RefreshCw size={16} className="inline mr-1" />
-                Reset
+                <RefreshCw size={14} />
               </button>
             </div>
           </div>
-          {startDate && endDate && (
-            <div className="mt-3 text-sm text-blue-700">
-              Showing data from <strong>{new Date(startDate).toLocaleDateString()}</strong> to <strong>{new Date(endDate).toLocaleDateString()}</strong>
-            </div>
-          )}
         </div>
 
         {/* Revenue Overview */}
