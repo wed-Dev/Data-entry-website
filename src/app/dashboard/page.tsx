@@ -163,7 +163,7 @@ export default function DashboardPage() {
                 color="bg-purple-600"
               />
               <MetricCard
-                title="Today's Combined Revenue"
+                title="Today&apos;s Combined Revenue"
                 value={metrics.combined_today_revenue}
                 icon={TrendingUp}
                 color="bg-orange-600"
