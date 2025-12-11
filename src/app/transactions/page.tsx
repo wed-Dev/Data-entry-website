@@ -333,7 +333,6 @@ export default function TransactionsPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer ID</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pickup</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Destination</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Distance</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
@@ -343,9 +342,8 @@ export default function TransactionsPage() {
                         <tr key={transaction.id} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.date}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{transaction.customerId}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{transaction.pickup}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{transaction.pickupLocation}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{transaction.destination}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{transaction.distance} KM</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">AED {transaction.price.toFixed(2)}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button onClick={() => handleEdit(transaction)} className="text-blue-600 hover:text-blue-900 mr-4">
